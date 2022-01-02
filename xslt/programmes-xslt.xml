@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- https://www.jenitennison.com/xslt/grouping/muenchian.html -->
+
+<xsl:transform version="1.0"
+	       xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+
+  <xsl:key name="programmes-by-title" match="programme" use="title"/>
+
+  <xsl:template match="tv">
+    <html>
+      <xsl:for-each select="programme[count(. | key('programmes-by-title', title)[1]) = 1]">
+	<xsl:sort select="title" />
+	<a>
+	  <xsl:attribute name="href"><xsl:value-of select="url" /></xsl:attribute>
+	  <xsl:value-of select="title" />
+	</a>
+	<br/>
+      </xsl:for-each>
+    </html>
+  </xsl:template>
+
+</xsl:transform>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- https://www.jenitennison.com/xslt/grouping/muenchian.html -->
+
+<xsl:transform version="1.0"
+	       xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+
+  <xsl:template match="html">
+    <div>Upcoming Programmes:<ul>
+      <xsl:for-each select="ins">
+	<li>
+	<a>
+	  <xsl:attribute name="href">
+	    <xsl:value-of select="a/@href" />
+	  </xsl:attribute>
+	  <xsl:value-of select="a" />
+	</a>
+	</li>
+      </xsl:for-each>
+    </ul>
+    </div>
+  </xsl:template>
+
+</xsl:transform>
