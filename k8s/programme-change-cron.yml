@@ -1,0 +1,39 @@
+---
+
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: xmltv
+  labels:
+    name: xmltv
+
+---
+
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: generate-change
+  namespace: xmltv
+spec:
+  schedule: "0 15 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          securityContext:
+            fsGroup: 107
+            runAsUser: 105
+            runAsGroup: 107
+          containers:
+            - name: generator
+              image: delnaught/xmltv-programmes:latest
+              command: ["python",  "/entrypoint.py", "/mnt/xmltv-programmes", "/mnt/zap2it/xmltv.xml", "10"]
+              volumeMounts:
+                - name: mythtv-varlib
+                  mountPath: '/mnt'
+          restartPolicy: Never
+          volumes:
+            - name: mythtv-varlib
+              hostPath:
+                path: /media/data/mythtv
+
