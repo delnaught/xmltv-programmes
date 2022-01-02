@@ -8,7 +8,7 @@ on:
     paths:
       - 'xslt/**'
       - 'entrypoint.py'
-      - 'requirements.py'
+      - 'requirements.txt'
 
 jobs:
   deliver-image:
