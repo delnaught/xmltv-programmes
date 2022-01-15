@@ -62,7 +62,7 @@ diff_str = main.diff_trees(reference, current,
 
 diff_tree = etree.fromstring(diff_str, xml_parser)
 wip = etree.ElementTree(diff_tree)
-wip.write('wip.xml', pretty_print = True)
+wip.write(str(workdir / 'wip.xml'), pretty_print = True)
 
 
 change_xslt = etree.parse('xslt/changes-xslt.xml', xml_parser)
