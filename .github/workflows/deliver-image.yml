@@ -5,10 +5,10 @@ name: Deliver Image
 on:
   workflow_dispatch:
   push:
-    paths:
-      - 'xslt/**'
-      - 'entrypoint.py'
-      - 'requirements.txt'
+    paths-ignore:
+      - 'k8s/**'
+      - '**/*.md'
+      - 'LICENSE'
 
 jobs:
   deliver-image:
