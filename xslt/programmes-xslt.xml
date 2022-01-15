@@ -1,22 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- https://www.jenitennison.com/xslt/grouping/muenchian.html -->
 
-<xsl:transform version="1.0"
-	       xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
-  <xsl:key name="programmes-by-title" match="programme" use="title"/>
+<xsl:stylesheet version="1.0"
+		xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+		xmlns:func="http://exslt.org/functions"
+		xmlns:regexp="http://exslt.org/regular-expressions"
+		extension-element-prefixes="func regexp">
+
+  <xsl:strip-space elements="*"/>
+
+  <func:function name="func:series-id">
+    <xsl:param name="url" />
+    <func:result select="regexp:match(string($url), 'programSeriesId=(.+)&amp;', 'i')[2]" />
+  </func:function>
+
+  <xsl:key name="series-by-url" match="programme" use="func:series-id(url)"/>
 
   <xsl:template match="tv">
-    <html>
-      <xsl:for-each select="programme[count(. | key('programmes-by-title', title)[1]) = 1]">
+    <tv>
+      <xsl:for-each select="programme[count(. | key('series-by-url', func:series-id(url))[1]) = 1]">
 	<xsl:sort select="title" />
-	<a>
-	  <xsl:attribute name="href"><xsl:value-of select="url" /></xsl:attribute>
-	  <xsl:value-of select="title" />
-	</a>
-	<br/>
+	<xsl:variable name="sid" select="func:series-id(url)" />
+	<xsl:if test="episode-num[@system='common']">
+	  <series>
+	    <xsl:attribute name="id">
+	      <xsl:value-of select="$sid"/>
+	    </xsl:attribute>
+	    <title>
+	      <xsl:value-of select="title" />
+	    </title>
+	    <url>
+	      <xsl:variable name="matches" select="regexp:match(string(url), '([^\?]+)\?.*(programSeriesId=[^&amp;]+)', 'i')" />
+	      <xsl:value-of select="$matches[2]" />?<xsl:value-of select="$matches[3]" />
+	    </url>
+	    <channel>
+	      <xsl:variable name="id" select="@channel" />
+	      <xsl:variable name="element" select="/tv/channel[@id=$id]" />
+	      <xsl:variable name="aliases" select="regexp:match(string($element/display-name[2]), '([0-9]+\.[0-9]) (.+)', 'i')" />
+	      <xsl:attribute name="id">
+		<xsl:value-of select="$id"/>
+	      </xsl:attribute>
+	      <number>
+		<xsl:value-of select="$aliases[2]" />
+	      </number>
+	      <name>
+		<xsl:value-of select="$aliases[3]" />
+	      </name>
+	      <icon>
+		<xsl:value-of select="$element/icon/@src" />
+	      </icon>
+	    </channel>
+	  </series>
+	</xsl:if>
       </xsl:for-each>
-    </html>
+    </tv>
   </xsl:template>
 
-</xsl:transform>
+</xsl:stylesheet>

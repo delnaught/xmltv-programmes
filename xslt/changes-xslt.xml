@@ -2,22 +2,49 @@
 <!-- https://www.jenitennison.com/xslt/grouping/muenchian.html -->
 
 <xsl:transform version="1.0"
-	       xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+	       xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+	       xmlns:diff="http://namespaces.shoobx.com/diff"
+		xmlns:func="http://exslt.org/functions"
+		xmlns:regexp="http://exslt.org/regular-expressions"
+		extension-element-prefixes="func regexp">
 
-  <xsl:template match="html">
-    <div>Upcoming Programmes:<ul>
-      <xsl:for-each select="ins">
-	<li>
-	<a>
-	  <xsl:attribute name="href">
-	    <xsl:value-of select="a/@href" />
-	  </xsl:attribute>
-	  <xsl:value-of select="a" />
-	</a>
-	</li>
-      </xsl:for-each>
-    </ul>
-    </div>
+  <xsl:strip-space elements="*"/>
+  
+  <func:function name="func:justify-chan">
+    <xsl:param name="chan" />
+    <xsl:variable name="matches" select="regexp:match(string($chan), '([0-9]+)\.([0-9])', 'i')" />
+    <func:result select="concat(substring(concat('00', $matches[2]), string-length($matches[2]) + 1, 2), $matches[3])" />
+  </func:function>
+
+  <xsl:template match="tv">
+    <div>Upcoming Programmes:<table><tbody>
+    <xsl:for-each select="series[@diff:insert]">
+      <xsl:sort select="func:justify-chan(channel/number)" />
+      <tr>
+	<td style="padding-right: 10px;">
+	  <img style="width: 100%; display: block;">
+	    <xsl:attribute name="src">
+	      <xsl:value-of select="channel/icon" />?w=55
+	    </xsl:attribute>
+	  </img>
+	</td>
+	<td align="right">
+	  <xsl:value-of select="channel/number" />
+	</td>
+	<td>
+	  <xsl:value-of select="channel/name" />
+	</td>
+	<td>
+	  <a>
+	    <xsl:attribute name="href">
+	      <xsl:value-of select="url" />
+	    </xsl:attribute>
+	    <xsl:value-of select="title" />
+	  </a>
+	</td>
+      </tr>
+    </xsl:for-each>
+    </tbody></table></div>
   </xsl:template>
 
 </xsl:transform>
